@@ -1,0 +1,13 @@
+*.o
+*.lo
+*.la
+*.a
+install/
+klee-cov-bak/
+O0-g-install/
+obj-gcov/
+obj-llvm/
+vul_insert/
+.libs/
+.deps/
+.vscode/
