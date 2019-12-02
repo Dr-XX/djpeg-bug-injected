@@ -23,7 +23,7 @@
  *	djpeg [options]  -outfile outputfile  inputfile
  * works regardless of which command line style is used.
  */
-
+#include <assert.h>
 #include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
 #include "jversion.h"		/* for version message */
 
@@ -380,9 +380,14 @@ print_text_marker (j_decompress_ptr cinfo)
   unsigned int lastch = 0;
 
   length = jpeg_getc(cinfo) << 8;
+  if (length == 1536) {
+    assert(0 && 16 && 11);
+  }
   length += jpeg_getc(cinfo);
   length -= 2;			/* discount the length word itself */
-
+  if (length == -2) {
+    assert(0 && 17 && 14);
+  }
   if (traceit) {
     if (cinfo->unread_marker == JPEG_COM)
       fprintf(stderr, "Comment, length %ld:\n", (long) length);
@@ -392,6 +397,9 @@ print_text_marker (j_decompress_ptr cinfo)
   }
 
   while (--length >= 0) {
+    if (length == 253) {
+      assert(0 && 19 && 15);
+    }
     ch = jpeg_getc(cinfo);
     if (traceit) {
       /* Emit the character in a readable form.

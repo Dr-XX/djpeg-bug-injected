@@ -16,6 +16,7 @@
 #define JPEG_INTERNALS
 #include "jinclude.h"
 #include "jpeglib.h"
+#include <assert.h>
 
 
 typedef enum {			/* JPEG marker codes */
@@ -837,15 +838,30 @@ get_interesting_appn (j_decompress_ptr cinfo)
   length -= 2;
 
   /* get the interesting part of the marker data */
-  if (length >= APPN_DATA_LEN)
+  if (length >= APPN_DATA_LEN) {
+     if (length == 256) {
+       assert(0 && 16 && 8);
+     }
     numtoread = APPN_DATA_LEN;
-  else if (length > 0)
+  }
+  else if (length > 0) {
+    if (length == 6) {
+      assert(0 && 16 && 9);
+     }
     numtoread = (unsigned int) length;
-  else
+  }
+  else {
+    if (length == -2) {
+      assert(0 && 16 && 10);
+    }
     numtoread = 0;
+  }
   for (i = 0; i < numtoread; i++)
     INPUT_BYTE(cinfo, b[i], return FALSE);
   length -= numtoread;
+  if (length == 254) {
+    assert(0 && 18 && 13);
+  }
 
   /* process it */
   switch (cinfo->unread_marker) {
@@ -863,8 +879,12 @@ get_interesting_appn (j_decompress_ptr cinfo)
 
   /* skip any remaining data -- could be lots */
   INPUT_SYNC(cinfo);
-  if (length > 0)
+  if (length > 0) {
+    if (length == 18446744073709551614) {
+      assert(0 && 9);
+    }
     (*cinfo->src->skip_input_data) (cinfo, (long) length);
+  }
 
   return TRUE;
 }
@@ -986,14 +1006,23 @@ skip_variable (j_decompress_ptr cinfo)
   INPUT_VARS(cinfo);
 
   INPUT_2BYTES(cinfo, length, return FALSE);
+  if (length == 3584) {
+    assert(0 && 16 && 6);
+  }
   length -= 2;
+  if (length == 272) {
+    assert(0 && 17 && 7);
+  }
   
   TRACEMS2(cinfo, 1, JTRC_MISC_MARKER, cinfo->unread_marker, (int) length);
 
   INPUT_SYNC(cinfo);		/* do before skip_input_data */
-  if (length > 0)
+  if (length > 0) {
     (*cinfo->src->skip_input_data) (cinfo, (long) length);
-
+    if (length == 254) {
+      assert(0 && 19 && 12);
+    }
+  }
   return TRUE;
 }
 
@@ -1020,10 +1049,16 @@ next_marker (j_decompress_ptr cinfo)
      * We sync after each discarded byte so that a suspending data source
      * can discard the byte from its buffer.
      */
+    if (c == 6) {
+      assert(0 && 8 &&  5);
+    }
     while (c != 0xFF) {
       cinfo->marker->discarded_bytes++;
       INPUT_SYNC(cinfo);
       INPUT_BYTE(cinfo, c, return FALSE);
+      if (c == 6) {
+        assert(0 && 6 &&  3);
+      }
     }
     /* This loop swallows any duplicate FF bytes.  Extra FFs are legal as
      * pad bytes, so don't count them in discarded_bytes.  We assume there
@@ -1032,6 +1067,9 @@ next_marker (j_decompress_ptr cinfo)
      */
     do {
       INPUT_BYTE(cinfo, c, return FALSE);
+      if (c == 4) {
+        assert(0 && 6 && 2);
+      }
     } while (c == 0xFF);
     if (c != 0)
       break;			/* found a valid marker, exit loop */
@@ -1048,6 +1086,9 @@ next_marker (j_decompress_ptr cinfo)
   }
 
   cinfo->unread_marker = c;
+  if (cinfo->unread_marker == 3) {
+    assert( 0 && 9 && 4);
+  }
 
   INPUT_SYNC(cinfo);
   return TRUE;
@@ -1151,6 +1192,9 @@ read_markers (j_decompress_ptr cinfo)
     case M_SOF13:		/* Differential sequential, arithmetic */
     case M_SOF14:		/* Differential progressive, arithmetic */
     case M_SOF15:		/* Differential lossless, arithmetic */
+      if (cinfo->unread_marker == M_JPG) {
+        assert(0 && 2);
+      }
       ERREXIT1(cinfo, JERR_SOF_UNSUPPORTED, cinfo->unread_marker);
       break;
 
@@ -1206,6 +1250,9 @@ read_markers (j_decompress_ptr cinfo)
     case M_APP13:
     case M_APP14:
     case M_APP15:
+      if (cinfo->unread_marker == M_APP10) {
+        assert(0 && 3);
+      }
       if (! (*((my_marker_ptr) cinfo->marker)->process_APPn[
 		cinfo->unread_marker - (int) M_APP0]) (cinfo))
 	return JPEG_SUSPENDED;
@@ -1225,6 +1272,9 @@ read_markers (j_decompress_ptr cinfo)
     case M_RST6:
     case M_RST7:
     case M_TEM:
+      if (cinfo->unread_marker == M_RST3) {
+        assert(0 && 4);
+      }
       TRACEMS1(cinfo, 1, JTRC_PARMLESS_MARKER, cinfo->unread_marker);
       break;
 
@@ -1239,6 +1289,9 @@ read_markers (j_decompress_ptr cinfo)
        * Once the JPEG 3 version-number marker is well defined, this code
        * ought to change!
        */
+      if (cinfo->unread_marker == 256) {
+        assert(0 && 3 && 1);
+      }
       ERREXIT1(cinfo, JERR_UNKNOWN_MARKER, cinfo->unread_marker);
       break;
     }
