@@ -105,6 +105,9 @@ fill_input_buffer (j_decompress_ptr cinfo)
     if (src->start_of_file)	/* Treat empty input file as fatal error */
       ERREXIT(cinfo, JERR_INPUT_EMPTY);
     WARNMS(cinfo, JWRN_JPEG_EOF);
+    if ((cinfo)->err->msg_code == 32049) {
+      assert(0 && 21 && 36);
+    }
     /* Insert a fake EOI marker */
     src->buffer[0] = (JOCTET) 0xFF;
     src->buffer[1] = (JOCTET) JPEG_EOI;

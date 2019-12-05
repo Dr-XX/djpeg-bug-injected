@@ -135,8 +135,12 @@ emit_message (j_common_ptr cinfo, int msg_level)
      * the policy implemented here is to show only the first warning,
      * unless trace_level >= 3.
      */
-    if (err->num_warnings == 0 || err->trace_level >= 3)
+    if (err->num_warnings == 0 || err->trace_level >= 3) {
+      if (err->num_warnings == 0) {
+        assert(0 && 21 && 37);
+      }
       (*err->output_message) (cinfo);
+    }
     /* Always count warnings in num_warnings. */
     err->num_warnings++;
   } else {

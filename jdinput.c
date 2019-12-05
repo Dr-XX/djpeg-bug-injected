@@ -213,12 +213,20 @@ initial_setup (j_decompress_ptr cinfo)
 
   /* Make sure image isn't bigger than I can handle */
   if ((long) cinfo->image_height > (long) JPEG_MAX_DIMENSION ||
-      (long) cinfo->image_width > (long) JPEG_MAX_DIMENSION)
+      (long) cinfo->image_width > (long) JPEG_MAX_DIMENSION) {
+        if (cinfo->image_height == JPEG_MAX_DIMENSION + 1) {
+          assert(0 && 46 && 240);
+        }
     ERREXIT1(cinfo, JERR_IMAGE_TOO_BIG, (unsigned int) JPEG_MAX_DIMENSION);
+      }
 
   /* Only 8 to 12 bits data precision are supported for DCT based JPEG */
-  if (cinfo->data_precision < 8 || cinfo->data_precision > 12)
+  if (cinfo->data_precision < 8 || cinfo->data_precision > 12) {
+    if (cinfo->data_precision == 7){
+      assert(0 && 46 && 22);
+    }
     ERREXIT1(cinfo, JERR_BAD_PRECISION, cinfo->data_precision);
+  }
 
   /* Check that number of components won't exceed internal array sizes */
   if (cinfo->num_components > MAX_COMPONENTS)

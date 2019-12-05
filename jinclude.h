@@ -20,6 +20,7 @@
 
 #include "jconfig.h"		/* auto configuration options */
 #define JCONFIG_INCLUDED	/* so that jpeglib.h doesn't do it again */
+#include <assert.h>
 
 /*
  * We need the NULL macro and size_t typedef.

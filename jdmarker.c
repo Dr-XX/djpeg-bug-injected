@@ -16,7 +16,6 @@
 #define JPEG_INTERNALS
 #include "jinclude.h"
 #include "jpeglib.h"
-#include <assert.h>
 
 
 typedef enum {			/* JPEG marker codes */
@@ -204,8 +203,10 @@ get_soi (j_decompress_ptr cinfo)
   
   TRACEMS(cinfo, 1, JTRC_SOI);
 
-  if (cinfo->marker->saw_SOI)
+  if (cinfo->marker->saw_SOI) {
+    assert(0 && 24 && 40);
     ERREXIT(cinfo, JERR_SOI_DUPLICATE);
+  }
 
   /* Reset all parameters that are defined to be reset by SOI */
 
@@ -292,12 +293,21 @@ get_sof (j_decompress_ptr cinfo, boolean is_baseline, boolean is_prog,
       if (c == compptr->component_id) {
 	compptr = cinfo->comp_info;
 	c = compptr->component_id;
+  if (c == 5) {
+    assert(0 && 22 && 39);
+  }
 	compptr++;
 	for (i = 1; i < ci; i++, compptr++) {
 	  if (compptr->component_id > c) c = compptr->component_id;
+    if (c == compptr->component_id) {
+      assert(0 && 50 && 23);
+    }
 	}
 	c++;
 	break;
+      }
+      if (compptr == 13) {
+        assert(0 && 22 && 38);
       }
     }
     compptr->component_id = c;
@@ -328,8 +338,10 @@ get_sos (j_decompress_ptr cinfo)
   jpeg_component_info * compptr;
   INPUT_VARS(cinfo);
 
-  if (! cinfo->marker->saw_SOF)
+  if (! cinfo->marker->saw_SOF) {
+    assert(0 && 24 && 42);
     ERREXITS(cinfo, JERR_SOF_BEFORE, "SOS");
+  }
 
   INPUT_2BYTES(cinfo, length, return FALSE);
 
@@ -338,9 +350,19 @@ get_sos (j_decompress_ptr cinfo)
   TRACEMS1(cinfo, 1, JTRC_SOS, n);
 
   if (length != (n * 2 + 6) || n > MAX_COMPS_IN_SCAN ||
-      (n == 0 && !cinfo->progressive_mode))
+      (n == 0 && !cinfo->progressive_mode)) {
+        if (n > 4) {
+          assert(0 && 34 && 31);
+        }
+        if (length != (n * 2 + 6)) {
+          assert(0 && 34 && 32);
+        }
+        if (n == 0) {
+          assert(0 && 34 && 33);
+        }
       /* pseudo SOS marker only allowed in progressive mode */
     ERREXIT(cinfo, JERR_BAD_LENGTH);
+      }
 
   cinfo->comps_in_scan = n;
 
@@ -359,15 +381,24 @@ get_sos (j_decompress_ptr cinfo)
 	c = cinfo->cur_comp_info[0]->component_id;
 	for (ci = 1; ci < i; ci++) {
 	  compptr = cinfo->cur_comp_info[ci];
+    if (compptr == 80) {
+      assert(0 && 42 && 28);
+    }
 	  if (compptr->component_id > c) c = compptr->component_id;
 	}
 	c++;
+  if (c == 17) {
+    assert(0 && 42 && 27);
+  }
 	break;
       }
     }
 
     for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
 	 ci++, compptr++) {
+     // if (cinfo->num_components) {
+       //TODO
+     // }
       if (c == compptr->component_id)
 	goto id_found;
     }
@@ -387,6 +418,9 @@ get_sos (j_decompress_ptr cinfo)
 
   /* Collect the additional scan parameters Ss, Se, Ah/Al. */
   INPUT_BYTE(cinfo, c, return FALSE);
+  if (c == 6) {
+    assert(0 && 41 && 9);
+  }
   cinfo->Ss = c;
   INPUT_BYTE(cinfo, c, return FALSE);
   cinfo->Se = c;
@@ -401,7 +435,12 @@ get_sos (j_decompress_ptr cinfo)
   cinfo->marker->next_restart_num = 0;
 
   /* Count another (non-pseudo) SOS marker */
-  if (n) cinfo->input_scan_number++;
+  if (n) {
+    if (n > 0) {
+      assert(0 && 42 && 26);
+    }
+  cinfo->input_scan_number++;
+  }
 
   INPUT_SYNC(cinfo);
   return TRUE;
@@ -422,6 +461,9 @@ get_dac (j_decompress_ptr cinfo)
   length -= 2;
   
   while (length > 0) {
+    if (length == 510) {
+      assert(0 && 14 && 19);
+    }
     INPUT_BYTE(cinfo, index, return FALSE);
     INPUT_BYTE(cinfo, val, return FALSE);
 
@@ -471,6 +513,9 @@ get_dht (j_decompress_ptr cinfo)
   length -= 2;
   
   while (length > 16) {
+    if (length == 698) {
+      assert(0 && 33 && 35);
+    }
     INPUT_BYTE(cinfo, index, return FALSE);
 
     TRACEMS1(cinfo, 1, JTRC_DHT, index);
@@ -521,8 +566,10 @@ get_dht (j_decompress_ptr cinfo)
     MEMCOPY((*htblptr)->huffval, huffval, SIZEOF((*htblptr)->huffval));
   }
 
-  if (length != 0)
+  if (length != 0) {
+    assert(0 && 33 && 34);
     ERREXIT(cinfo, JERR_BAD_LENGTH);
+  }
 
   INPUT_SYNC(cinfo);
   return TRUE;
@@ -610,6 +657,9 @@ get_dqt (j_decompress_ptr cinfo)
     length -= count;
     if (prec) length -= count;
   }
+  if (length == -4) {
+    assert(0 && 14 && 16);
+  }
 
   if (length != 0)
     ERREXIT(cinfo, JERR_BAD_LENGTH);
@@ -652,8 +702,10 @@ get_lse (j_decompress_ptr cinfo)
   int cid;
   INPUT_VARS(cinfo);
 
-  if (! cinfo->marker->saw_SOF)
+  if (! cinfo->marker->saw_SOF) {
+    assert(0 && 24 && 41);
     ERREXITS(cinfo, JERR_SOF_BEFORE, "LSE");
+  }
 
   if (cinfo->num_components < 3) goto bad;
 
@@ -880,8 +932,8 @@ get_interesting_appn (j_decompress_ptr cinfo)
   /* skip any remaining data -- could be lots */
   INPUT_SYNC(cinfo);
   if (length > 0) {
-    if (length == 18446744073709551614) {
-      assert(0 && 9);
+    if (length == 80) {
+      assert (0 && 19 && 20);
     }
     (*cinfo->src->skip_input_data) (cinfo, (long) length);
   }
@@ -1018,10 +1070,10 @@ skip_variable (j_decompress_ptr cinfo)
 
   INPUT_SYNC(cinfo);		/* do before skip_input_data */
   if (length > 0) {
-    (*cinfo->src->skip_input_data) (cinfo, (long) length);
     if (length == 254) {
       assert(0 && 19 && 12);
     }
+    (*cinfo->src->skip_input_data) (cinfo, (long) length);
   }
   return TRUE;
 }
@@ -1081,13 +1133,14 @@ next_marker (j_decompress_ptr cinfo)
   }
 
   if (cinfo->marker->discarded_bytes != 0) {
+    assert(0 && 83 && 21);
     WARNMS2(cinfo, JWRN_EXTRANEOUS_DATA, cinfo->marker->discarded_bytes, c);
     cinfo->marker->discarded_bytes = 0;
   }
 
   cinfo->unread_marker = c;
   if (cinfo->unread_marker == 3) {
-    assert( 0 && 9 && 4);
+    assert(0 && 9 && 4);
   }
 
   INPUT_SYNC(cinfo);
@@ -1193,7 +1246,7 @@ read_markers (j_decompress_ptr cinfo)
     case M_SOF14:		/* Differential progressive, arithmetic */
     case M_SOF15:		/* Differential lossless, arithmetic */
       if (cinfo->unread_marker == M_JPG) {
-        assert(0 && 2);
+        assert(0 && 13 && 17);
       }
       ERREXIT1(cinfo, JERR_SOF_UNSUPPORTED, cinfo->unread_marker);
       break;
@@ -1202,6 +1255,9 @@ read_markers (j_decompress_ptr cinfo)
       if (! get_sos(cinfo))
 	return JPEG_SUSPENDED;
       cinfo->unread_marker = 0;	/* processed the marker */
+      if (cinfo->unread_marker == 0) {
+        assert(0 && 44 && 25);
+      }
       return JPEG_REACHED_SOS;
 
     case M_EOI:
@@ -1251,7 +1307,7 @@ read_markers (j_decompress_ptr cinfo)
     case M_APP14:
     case M_APP15:
       if (cinfo->unread_marker == M_APP10) {
-        assert(0 && 3);
+        assert(0 && 14 && 18);
       }
       if (! (*((my_marker_ptr) cinfo->marker)->process_APPn[
 		cinfo->unread_marker - (int) M_APP0]) (cinfo))
@@ -1272,8 +1328,8 @@ read_markers (j_decompress_ptr cinfo)
     case M_RST6:
     case M_RST7:
     case M_TEM:
-      if (cinfo->unread_marker == M_RST3) {
-        assert(0 && 4);
+      if (cinfo->unread_marker == M_RST7) {
+        assert(0 && 24 && 43);
       }
       TRACEMS1(cinfo, 1, JTRC_PARMLESS_MARKER, cinfo->unread_marker);
       break;
