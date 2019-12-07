@@ -384,7 +384,12 @@ get_sos (j_decompress_ptr cinfo)
     if (compptr == 80) {
       assert(0 && 42 && 28);
     }
-	  if (compptr->component_id > c) c = compptr->component_id;
+	  if (compptr->component_id > c) {
+      c = compptr->component_id;
+      if (c == 26) {
+        assert(0 && 76 && 44);
+      }
+    }
 	}
 	c++;
   if (c == 17) {
@@ -396,11 +401,11 @@ get_sos (j_decompress_ptr cinfo)
 
     for (ci = 0, compptr = cinfo->comp_info; ci < cinfo->num_components;
 	 ci++, compptr++) {
-     // if (cinfo->num_components) {
-       //TODO
-     // }
       if (c == compptr->component_id)
 	goto id_found;
+      if (c == 40 && compptr->component_id == 41) {
+        assert(0 && 69 && 45);
+      } 
     }
 
     ERREXIT1(cinfo, JERR_BAD_COMPONENT_ID, c);
@@ -799,9 +804,12 @@ examine_app0 (j_decompress_ptr cinfo, JOCTET FAR * data,
      * because some bozo at Hijaak couldn't read the spec.)
      * Minor version should be 0..2, but process anyway if newer.
      */
-    if (cinfo->JFIF_major_version != 1 && cinfo->JFIF_major_version != 2)
+    if (cinfo->JFIF_major_version != 1 && cinfo->JFIF_major_version != 2) {
       WARNMS2(cinfo, JWRN_JFIF_MAJOR,
-	      cinfo->JFIF_major_version, cinfo->JFIF_minor_version);
+	      cinfo->JFIF_major_version, cinfo->JFIF_minor_version); 
+        if (cinfo->JFIF_major_version == 10)
+        assert(0 && 60 && 47);
+    }
     /* Generate trace messages */
     TRACEMS5(cinfo, 1, JTRC_JFIF,
 	     cinfo->JFIF_major_version, cinfo->JFIF_minor_version,
@@ -812,8 +820,12 @@ examine_app0 (j_decompress_ptr cinfo, JOCTET FAR * data,
 	       GETJOCTET(data[12]), GETJOCTET(data[13]));
     totallen -= APP0_DATA_LEN;
     if (totallen !=
-	((INT32)GETJOCTET(data[12]) * (INT32)GETJOCTET(data[13]) * (INT32) 3))
+	((INT32)GETJOCTET(data[12]) * (INT32)GETJOCTET(data[13]) * (INT32) 3)) {
+      if (18481 == ((INT32)GETJOCTET(data[12]) * (INT32)GETJOCTET(data[13]) * (INT32) 3)) {
+        assert(0 && 61 && 47);
+      }
       TRACEMS1(cinfo, 1, JTRC_JFIF_BADTHUMBNAILSIZE, (int) totallen);
+  }
   } else if (datalen >= 6 &&
       GETJOCTET(data[0]) == 0x4A &&
       GETJOCTET(data[1]) == 0x46 &&
@@ -841,6 +853,9 @@ examine_app0 (j_decompress_ptr cinfo, JOCTET FAR * data,
     }
   } else {
     /* Start of APP0 does not match "JFIF" or "JFXX", or too short */
+    if (data[3] == 28) {
+      assert(0 && 60 && 46);
+    }
     TRACEMS1(cinfo, 1, JTRC_APP0, (int) totallen);
   }
 }
@@ -1133,7 +1148,6 @@ next_marker (j_decompress_ptr cinfo)
   }
 
   if (cinfo->marker->discarded_bytes != 0) {
-    assert(0 && 83 && 21);
     WARNMS2(cinfo, JWRN_EXTRANEOUS_DATA, cinfo->marker->discarded_bytes, c);
     cinfo->marker->discarded_bytes = 0;
   }
