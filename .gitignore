@@ -9,6 +9,7 @@ obj-gcov/
 obj-llvm/
 vul_insert/
 afl-install/
+in/
 .libs/
 .deps/
 .vscode/
