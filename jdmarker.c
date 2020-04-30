@@ -854,7 +854,7 @@ examine_app0 (j_decompress_ptr cinfo, JOCTET FAR * data,
   } else {
     /* Start of APP0 does not match "JFIF" or "JFXX", or too short */
     if (data[3] == 28) {
-      assert(0 && 60 && 46);
+      assert(0 && 18 && 46);
     }
     TRACEMS1(cinfo, 1, JTRC_APP0, (int) totallen);
   }
@@ -926,7 +926,7 @@ get_interesting_appn (j_decompress_ptr cinfo)
   for (i = 0; i < numtoread; i++)
     INPUT_BYTE(cinfo, b[i], return FALSE);
   length -= numtoread;
-  if (length == 254) {
+  if (length == 256-2) {
     assert(0 && 18 && 13);
   }
 
@@ -1073,11 +1073,11 @@ skip_variable (j_decompress_ptr cinfo)
   INPUT_VARS(cinfo);
 
   INPUT_2BYTES(cinfo, length, return FALSE);
-  if (length == 3584) {
+  if (length == 256*14) {
     assert(0 && 16 && 6);
   }
   length -= 2;
-  if (length == 272) {
+  if (length == 256+16) {
     assert(0 && 17 && 7);
   }
   
@@ -1085,7 +1085,7 @@ skip_variable (j_decompress_ptr cinfo)
 
   INPUT_SYNC(cinfo);		/* do before skip_input_data */
   if (length > 0) {
-    if (length == 254) {
+    if (length == 256-2) {
       assert(0 && 19 && 12);
     }
     (*cinfo->src->skip_input_data) (cinfo, (long) length);

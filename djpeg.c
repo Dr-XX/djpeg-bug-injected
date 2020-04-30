@@ -380,7 +380,7 @@ print_text_marker (j_decompress_ptr cinfo)
   unsigned int lastch = 0;
 
   length = jpeg_getc(cinfo) << 8;
-  if (length == 1536) {
+  if (length == 256*6) {
     assert(0 && 16 && 11);
   }
   length += jpeg_getc(cinfo);
@@ -397,7 +397,7 @@ print_text_marker (j_decompress_ptr cinfo)
   }
 
   while (--length >= 0) {
-    if (length == 253) {
+    if (length == 256-2-1) {
       assert(0 && 19 && 15);
     }
     ch = jpeg_getc(cinfo);

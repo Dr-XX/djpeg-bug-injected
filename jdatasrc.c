@@ -105,7 +105,7 @@ fill_input_buffer (j_decompress_ptr cinfo)
     if (src->start_of_file)	/* Treat empty input file as fatal error */
       ERREXIT(cinfo, JERR_INPUT_EMPTY);
     WARNMS(cinfo, JWRN_JPEG_EOF);
-    if ((cinfo)->err->msg_code == 32049) {
+    if ((cinfo)->err->msg_code == 0x7D31) {
       assert(0 && 21 && 36);
     }
     /* Insert a fake EOI marker */
